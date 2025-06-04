@@ -12,6 +12,31 @@ input CreateCustomerInput {
   postal_code: String
 }
 
+input CreateOrderInput {
+  customer_crm_id: String!
+  items: [CreateOrderItemInput!]!
+  shipping_address_city: String
+  shipping_address_country: String
+  shipping_address_postal_code: String
+  shipping_address_street: String
+}
+
+input CreateOrderItemInput {
+  price: Float!
+  product_id: Int!
+  product_name: String!
+  quantity: Int!
+}
+
+input CreateProductInput {
+  description: String
+  image_url: String
+  name: String!
+  price: Float!
+  status: String
+  stock: Int!
+}
+
 type CustomerDTO {
   address: String
   city: String
@@ -38,11 +63,93 @@ scalar DateTime
 type Mutation {
   """Membuat customer baru di CRM Service."""
   createCustomer(input: CreateCustomerInput!): CustomerDTO!
+
+  """Membuat pesanan baru."""
+  createOrder(input: CreateOrderInput!): OrderDTO!
+
+  """Membuat produk baru."""
+  createProduct(input: CreateProductInput!): ProductDTO!
+
+  """Menghapus pesanan berdasarkan ID."""
+  deleteOrder(order_id: ID!): Boolean!
+
+  """Menghapus produk berdasarkan ID."""
+  deleteProduct(product_id: ID!): Boolean!
+
+  """Memperbarui produk yang sudah ada."""
+  updateProduct(input: UpdateProductInput!, product_id: ID!): ProductDTO!
+
+  """Memperbarui status pesanan."""
+  updateStatus(order_id: ID!, payment_status: String, shipping_status: String): OrderDTO!
+}
+
+type OrderDTO {
+  created_at: String!
+  customer_crm_id: String!
+  order_date: String!
+  order_id: ID!
+  order_items: [OrderItemDTO!]!
+  payment_status: String
+  shipping_address_city: String
+  shipping_address_country: String
+  shipping_address_postal_code: String
+  shipping_address_street: String
+  shipping_status: String
+  total_price: Float!
+  updated_at: String
+}
+
+input OrderFilters {
+  customer_crm_id: String
+  payment_status: String
+  shipping_status: String
+}
+
+type OrderItemDTO {
+  order_id: Int!
+  order_item_id: ID!
+  price: Float!
+  product_id: Int!
+  product_name: String!
+  quantity: Int!
+}
+
+type ProductDTO {
+  created_at: String!
+  description: String
+  image_url: String
+  name: String!
+  price: Float!
+  product_id: ID!
+  status: String!
+  stock: Int!
+  updated_at: String
+}
+
+input ProductFilters {
+  maxPrice: Float
+  maxStock: Int
+  minPrice: Float
+  minStock: Int
+  search: String
+  status: String
 }
 
 type Query {
+  """Mengambil daftar semua pesanan, bisa difilter."""
+  allOrders(filters: OrderFilters): [OrderDTO!]!
+
+  """Mengambil daftar semua produk, bisa difilter."""
+  allProducts(filters: ProductFilters): [ProductDTO!]!
+
   """Mengambil detail customer berdasarkan ID dari CRM Service."""
   customer(id: ID!): CustomerDTO
+
+  """Mengambil detail pesanan berdasarkan ID."""
+  order(order_id: ID!): OrderDTO
+
+  """Mengambil detail produk berdasarkan ID."""
+  product(product_id: ID!): ProductDTO
 }
 
 input UpdateCustomerInput {
@@ -53,4 +160,13 @@ input UpdateCustomerInput {
   name: String
   phone: String
   postal_code: String
+}
+
+input UpdateProductInput {
+  description: String
+  image_url: String
+  name: String
+  price: Float
+  status: String
+  stock: Int
 }

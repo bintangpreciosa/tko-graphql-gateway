@@ -1,106 +1,77 @@
 // src/customer/customer.service.ts
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import axios from 'axios';
+// Tidak perlu axios lagi untuk mock data sementara
+// import axios from 'axios';
 import { CustomerDTO, CreateCustomerInput, UpdateCustomerInput } from './dto/customer.dto';
 
 @Injectable()
 export class CustomerService {
-  // *** PENTING: GANTI DENGAN ENDPOINT GRAPHQL ASLI DARI CUSTOMER SERVICE CRM MEREKA ***
-  // Jika mereka berjalan di Docker Compose di jaringan yang sama, ini mungkin:
-  // 'http://customer-service:4000/graphql' (sesuai nama service dan port internal mereka)
-  private readonly CRM_GRAPHQL_ENDPOINT = 'http://localhost:3001/graphql'; 
+  // Tidak perlu lagi endpoint CRM untuk mock data sementara
+  // private readonly CRM_GRAPHQL_ENDPOINT = 'http://localhost:3000/graphql';
+  // private readonly AUTH_HEADERS = { 'Content-Type': 'application/json' };
 
-  // Tambahkan headers jika Customer Service CRM memerlukan otentikasi (misalnya, token API Key)
-  private readonly AUTH_HEADERS = {
-    // 'Authorization': 'Bearer YOUR_CRM_API_KEY_OR_TOKEN', // Uncomment dan ganti jika perlu
-    'Content-Type': 'application/json',
-  };
+  // Data customer mock sementara
+  private mockCustomers: CustomerDTO[] = [
+    {
+      id: '1',
+      name: 'Budi Mock',
+      email: 'budi.mock@example.com',
+      phone: '08111111111',
+      address: 'Jl. Mock Raya No. 1',
+      city: 'Mock City',
+      postal_code: '10000',
+      country: 'Indonesia',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      logins: []
+    },
+    {
+      id: '2',
+      name: 'Siti Mock',
+      email: 'siti.mock@example.com',
+      phone: '08222222222',
+      address: 'Jl. Tes Mock No. 2',
+      city: 'Mock City',
+      postal_code: '20000',
+      country: 'Indonesia',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      logins: []
+    },
+  ];
+  private nextMockId = 3; // Untuk generate ID baru jika membuat customer mock
 
-  // Method untuk mengambil customer berdasarkan ID
-  async getCustomerById(id: string): Promise<CustomerDTO> {
-    const query = `
-      query GetCustomer($id: ID!) {
-        customer(id: $id) {
-          id
-          name
-          email
-          phone
-          address
-          city
-          postal_code
-          country
-          created_at
-          updated_at
-          # Uncomment jika Anda ingin data logins juga
-          # logins(limit: 5) {
-          #   id
-          #   login_time
-          # }
-        }
-      }
-    `;
-    try {
-      const response = await axios.post(
-        this.CRM_GRAPHQL_ENDPOINT,
-        {
-          query,
-          variables: { id },
-        },
-        { headers: this.AUTH_HEADERS },
-      );
-
-      if (response.data.errors) {
-        console.error('CRM GraphQL Errors:', response.data.errors);
-        throw new InternalServerErrorException('CRM API returned errors.');
-      }
-
-      return response.data.data.customer;
-    } catch (error) {
-      console.error('Error fetching customer by ID from CRM:', error.response?.data || error.message);
-      throw new InternalServerErrorException('Failed to fetch customer data from CRM.');
+  async getCustomerById(id: string): Promise<CustomerDTO | null> {
+    const customer = this.mockCustomers.find(c => c.id === id);
+    if (customer) {
+      console.log(`[MOCK] Fetched customer with ID: ${id}`);
+      return customer;
     }
+    console.log(`[MOCK] Customer with ID: ${id} not found.`);
+    // Sekarang, mengembalikan null diizinkan oleh tipe kembalian
+    return null;
   }
 
-  // Method untuk membuat customer baru
   async createCustomer(input: CreateCustomerInput): Promise<CustomerDTO> {
-    const mutation = `
-      mutation CreateCustomer($input: CreateCustomerInput!) {
-        createCustomer(input: $input) {
-          id
-          name
-          email
-          phone
-          address
-          city
-          postal_code
-          country
-          created_at
-          updated_at
-        }
-      }
-    `;
-    try {
-      const response = await axios.post(
-        this.CRM_GRAPHQL_ENDPOINT,
-        {
-          query: mutation,
-          variables: { input },
-        },
-        { headers: this.AUTH_HEADERS },
-      );
-
-      if (response.data.errors) {
-        console.error('CRM GraphQL Errors:', response.data.errors);
-        throw new InternalServerErrorException('CRM API returned errors.');
-      }
-
-      return response.data.data.createCustomer;
-    } catch (error) {
-      console.error('Error creating customer in CRM:', error.response?.data || error.message);
-      throw new InternalServerErrorException('Failed to create customer in CRM.');
-    }
+    // Generate ID baru untuk mock customer
+    const newId = String(this.nextMockId++);
+    const newCustomer: CustomerDTO = {
+      id: newId,
+      name: input.name,
+      email: input.email,
+      phone: input.phone || undefined,
+      address: input.address || undefined,
+      city: input.city || undefined,
+      postal_code: input.postal_code || undefined,
+      country: input.country || undefined,
+      created_at: new Date().toISOString(),
+      updated_at: undefined, // updated_at juga bisa jadi undefined jika tidak ada update
+      logins: []
+    };
+    this.mockCustomers.push(newCustomer);
+    console.log(`[MOCK] Created new customer with ID: ${newId}`);
+    return newCustomer;
   }
 
-  // Anda bisa tambahkan method lain di sini sesuai kebutuhan (getCustomerByEmail, updateCustomer, deleteCustomer, dll.)
-  // berdasarkan skema GraphQL CRM yang sudah Anda dapatkan
+  // Anda bisa tambahkan mock method untuk getCustomerByEmail, updateCustomer, dll. jika diperlukan
 }

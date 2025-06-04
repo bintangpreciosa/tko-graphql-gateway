@@ -12,7 +12,7 @@ export class CustomerResolver {
     nullable: true, // Query ini bisa mengembalikan null jika customer tidak ditemukan
     description: 'Mengambil detail customer berdasarkan ID dari CRM Service.',
   })
-  async customer(@Args('id', { type: () => ID }) id: string): Promise<CustomerDTO> {
+  async customer(@Args('id', { type: () => ID }) id: string): Promise<CustomerDTO | null> {
     return this.customerService.getCustomerById(id);
   }
 
