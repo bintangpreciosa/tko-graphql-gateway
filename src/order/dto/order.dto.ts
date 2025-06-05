@@ -38,11 +38,11 @@ export class OrderDTO {
   @Field(() => Float)
   total_price: number;
 
-  @Field({ nullable: true })
-  payment_status?: string;
+  @Field(() => String, { nullable: true })
+  payment_status?: string | null; // Sekarang bisa string, null, atau undefined
 
-  @Field({ nullable: true })
-  shipping_status?: string;
+  @Field(() => String, { nullable: true })
+  shipping_status?: string | null; // Sekarang bisa string, null, atau undefined
 
   // --- PERUBAHAN DI SINI: MENAMBAHKAN '| null' KE TIPE ALAMAT ---
   @Field(() => String, { nullable: true }) // <-- UBAH INI

@@ -171,7 +171,7 @@ export class OrderService {
   }
 
   // Method untuk memperbarui status pesanan
-  async updateStatus(order_id: number, payment_status?: string, shipping_status?: string): Promise<OrderDTO> {
+  async updateStatus(order_id: number, payment_status?: string, shipping_status?: string | null): Promise<OrderDTO> {
     // Mencari order berdasarkan ID
     const order = await this.orderRepository.findOne({ where: { order_id } });
     if (!order) {
@@ -182,7 +182,7 @@ export class OrderService {
     if (payment_status) {
       order.payment_status = payment_status;
     }
-    if (shipping_status) {
+    if (shipping_status !== undefined) { // Memastikan null juga diterima
       order.shipping_status = shipping_status;
     }
 

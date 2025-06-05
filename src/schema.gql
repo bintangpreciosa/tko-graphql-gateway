@@ -28,6 +28,12 @@ input CreateOrderItemInput {
   quantity: Int!
 }
 
+input CreatePaymentInput {
+  amount: Float!
+  order_id: ID!
+  payment_method: String!
+}
+
 input CreateProductInput {
   description: String
   image_url: String
@@ -67,14 +73,23 @@ type Mutation {
   """Membuat pesanan baru."""
   createOrder(input: CreateOrderInput!): OrderDTO!
 
+  """Membuat pembayaran baru."""
+  createPayment(input: CreatePaymentInput!): PaymentDTO!
+
   """Membuat produk baru."""
   createProduct(input: CreateProductInput!): ProductDTO!
 
   """Menghapus pesanan berdasarkan ID."""
   deleteOrder(order_id: ID!): Boolean!
 
+  """Menghapus pembayaran berdasarkan ID."""
+  deletePayment(payment_id: ID!): Boolean!
+
   """Menghapus produk berdasarkan ID."""
   deleteProduct(product_id: ID!): Boolean!
+
+  """Memperbarui status pembayaran."""
+  updatePaymentStatus(payment_id: ID!, payment_status: String!): PaymentDTO!
 
   """Memperbarui produk yang sudah ada."""
   updateProduct(input: UpdateProductInput!, product_id: ID!): ProductDTO!
@@ -114,6 +129,15 @@ type OrderItemDTO {
   quantity: Int!
 }
 
+type PaymentDTO {
+  amount: Float!
+  order_id: ID!
+  payment_date: String!
+  payment_id: ID!
+  payment_method: String!
+  payment_status: String!
+}
+
 type ProductDTO {
   created_at: String!
   description: String
@@ -139,6 +163,9 @@ type Query {
   """Mengambil daftar semua pesanan, bisa difilter."""
   allOrders(filters: OrderFilters): [OrderDTO!]!
 
+  """Mengambil daftar semua pembayaran."""
+  allPayments: [PaymentDTO!]!
+
   """Mengambil daftar semua produk, bisa difilter."""
   allProducts(filters: ProductFilters): [ProductDTO!]!
 
@@ -147,6 +174,9 @@ type Query {
 
   """Mengambil detail pesanan berdasarkan ID."""
   order(order_id: ID!): OrderDTO
+
+  """Mengambil detail pembayaran berdasarkan ID."""
+  payment(payment_id: ID!): PaymentDTO
 
   """Mengambil detail produk berdasarkan ID."""
   product(product_id: ID!): ProductDTO
