@@ -1,7 +1,7 @@
 // src/order/order.resolver.ts
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
-import { OrderService } from './order.service'; // Import OrderService
-import { OrderDTO, CreateOrderInput, UpdateOrderInput, OrderFilters } from './dto/order.dto'; // Import DTOs Order
+import { OrderService } from './order.service'; 
+import { OrderDTO, CreateOrderInput, UpdateOrderInput, OrderFilters } from './dto/order.dto'; 
 
 @Resolver(() => OrderDTO) // Mengaitkan resolver ini dengan tipe OrderDTO GraphQL
 export class OrderResolver {

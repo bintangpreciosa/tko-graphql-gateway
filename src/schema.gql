@@ -2,6 +2,32 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input AddToCartInput {
+  customer_crm_id: String
+  product_id: Int!
+  quantity: Int!
+  session_id: String
+}
+
+type CartDTO {
+  cart_id: ID!
+  cart_items: [CartItemDTO!]!
+  created_at: String!
+  customer_crm_id: String
+  session_id: String
+  total_price: Float!
+  updated_at: String!
+}
+
+type CartItemDTO {
+  cart_id: ID!
+  cart_item_id: ID!
+  price: Float!
+  product_id: Int!
+  product_name: String!
+  quantity: Int!
+}
+
 input CreateCustomerInput {
   address: String
   city: String
@@ -43,6 +69,13 @@ input CreateProductInput {
   stock: Int!
 }
 
+input CreateShipmentInput {
+  courier_name: String
+  order_id: ID!
+  status: String
+  tracking_number: String
+}
+
 type CustomerDTO {
   address: String
   city: String
@@ -66,7 +99,18 @@ type CustomerLogin {
 """DateTime custom scalar type from ISO 8601 string"""
 scalar DateTime
 
+input GetCartInput {
+  customer_crm_id: String
+  session_id: String
+}
+
 type Mutation {
+  """Menambahkan produk ke keranjang belanja."""
+  addToCart(input: AddToCartInput!): CartDTO!
+
+  """Mengosongkan seluruh keranjang belanja."""
+  clearCart(input: GetCartInput!): Boolean!
+
   """Membuat customer baru di CRM Service."""
   createCustomer(input: CreateCustomerInput!): CustomerDTO!
 
@@ -79,6 +123,12 @@ type Mutation {
   """Membuat produk baru."""
   createProduct(input: CreateProductInput!): ProductDTO!
 
+  """Membuat pengiriman baru."""
+  createShipment(input: CreateShipmentInput!): ShipmentDTO!
+
+  """Menghapus keranjang belanja sepenuhnya berdasarkan ID."""
+  deleteCart(cart_id: ID!): Boolean!
+
   """Menghapus pesanan berdasarkan ID."""
   deleteOrder(order_id: ID!): Boolean!
 
@@ -88,11 +138,23 @@ type Mutation {
   """Menghapus produk berdasarkan ID."""
   deleteProduct(product_id: ID!): Boolean!
 
+  """Menghapus pengiriman berdasarkan ID."""
+  deleteShipment(shipment_id: ID!): Boolean!
+
+  """Menghapus item dari keranjang belanja."""
+  removeCartItem(input: RemoveFromCartInput!): CartDTO!
+
+  """Memperbarui kuantitas item di keranjang belanja."""
+  updateCartItemQuantity(input: UpdateCartItemInput!): CartDTO!
+
   """Memperbarui status pembayaran."""
   updatePaymentStatus(payment_id: ID!, payment_status: String!): PaymentDTO!
 
   """Memperbarui produk yang sudah ada."""
   updateProduct(input: UpdateProductInput!, product_id: ID!): ProductDTO!
+
+  """Memperbarui pengiriman yang sudah ada."""
+  updateShipment(input: UpdateShipmentInput!, shipment_id: ID!): ShipmentDTO!
 
   """Memperbarui status pesanan."""
   updateStatus(order_id: ID!, payment_status: String, shipping_status: String): OrderDTO!
@@ -169,6 +231,14 @@ type Query {
   """Mengambil daftar semua produk, bisa difilter."""
   allProducts(filters: ProductFilters): [ProductDTO!]!
 
+  """Mendapatkan daftar semua pengiriman (dapat difilter)."""
+  allShipments(filters: ShipmentFilters): [ShipmentDTO!]!
+
+  """
+  Mendapatkan keranjang belanja berdasarkan customer_crm_id atau session_id.
+  """
+  cart(input: GetCartInput!): CartDTO
+
   """Mengambil detail customer berdasarkan ID dari CRM Service."""
   customer(id: ID!): CustomerDTO
 
@@ -180,6 +250,43 @@ type Query {
 
   """Mengambil detail produk berdasarkan ID."""
   product(product_id: ID!): ProductDTO
+
+  """Mendapatkan detail pengiriman berdasarkan ID."""
+  shipment(shipment_id: ID!): ShipmentDTO
+}
+
+input RemoveFromCartInput {
+  cart_item_id: ID!
+}
+
+type ShipmentDTO {
+  courier_name: String
+  created_at: String!
+  delivery_date: String
+
+  """Detail pesanan terkait dengan pengiriman ini."""
+  order: OrderDTO
+  order_id: ID!
+  shipment_date: String
+  shipment_id: ID!
+  shipping_address_city: String
+  shipping_address_country: String
+  shipping_address_postal_code: String
+  shipping_address_street: String
+  status: String!
+  tracking_number: String
+  updated_at: String!
+}
+
+input ShipmentFilters {
+  courier_name: String
+  order_id: ID
+  status: String
+}
+
+input UpdateCartItemInput {
+  cart_item_id: ID!
+  quantity: Int!
 }
 
 input UpdateCustomerInput {
@@ -199,4 +306,13 @@ input UpdateProductInput {
   price: Float
   status: String
   stock: Int
+}
+
+input UpdateShipmentInput {
+  courier_name: String
+  delivery_date: String
+  shipment_date: String
+  shipment_id: ID!
+  status: String
+  tracking_number: String
 }

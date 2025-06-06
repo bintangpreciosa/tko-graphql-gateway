@@ -1,8 +1,8 @@
 // src/order/entity/order-item.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { Order } from './order.entity'; // Import Order entity
+import { Order } from './order.entity'; 
 
-@Entity('OrderItem') // Nama tabel di database adalah 'OrderItem'
+@Entity('OrderItem') 
 export class OrderItem {
   @PrimaryGeneratedColumn('increment') // order_item_id INT AUTO_INCREMENT PRIMARY KEY
   order_item_id: number;

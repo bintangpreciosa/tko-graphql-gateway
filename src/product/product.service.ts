@@ -1,9 +1,9 @@
 // src/product/product.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm'; // Import Like untuk pencarian
-import { Product } from './entity/product.entity'; // Import entitas Product
-import { CreateProductInput, UpdateProductInput, ProductFilters } from './dto/product.dto'; // Import DTOs
+import { Repository, Like } from 'typeorm'; 
+import { Product } from './entity/product.entity'; 
+import { CreateProductInput, UpdateProductInput, ProductFilters } from './dto/product.dto'; 
 
 @Injectable()
 export class ProductService {
@@ -23,16 +23,16 @@ export class ProductService {
         where.name = Like(`%${filters.search}%`); // Mencari berdasarkan nama produk
       }
       if (filters.minPrice) {
-        where.price = { ...where.price, ...{ gte: filters.minPrice } }; // price >= minPrice
+        where.price = { ...where.price, ...{ gte: filters.minPrice } }; 
       }
       if (filters.maxPrice) {
-        where.price = { ...where.price, ...{ lte: filters.maxPrice } }; // price <= maxPrice
+        where.price = { ...where.price, ...{ lte: filters.maxPrice } }; 
       }
       if (filters.minStock) {
-        where.stock = { ...where.stock, ...{ gte: filters.minStock } }; // stock >= minStock
+        where.stock = { ...where.stock, ...{ gte: filters.minStock } }; 
       }
       if (filters.maxStock) {
-        where.stock = { ...where.stock, ...{ lte: filters.maxStock } }; // stock <= maxStock
+        where.stock = { ...where.stock, ...{ lte: filters.maxStock } }; 
       }
       if (filters.status) {
         where.status = filters.status;
@@ -59,7 +59,7 @@ export class ProductService {
 
   // Method untuk memperbarui produk
   async update(product_id: number, input: UpdateProductInput): Promise<Product> {
-    const product = await this.findOneById(product_id); // Pastikan produknya ada
+    const product = await this.findOneById(product_id); 
 
     // Update field-field yang diberikan di input
     Object.assign(product, input);

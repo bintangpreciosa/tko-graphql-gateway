@@ -1,7 +1,7 @@
 // src/payment/payment.resolver.ts
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
-import { PaymentService } from './payment.service'; // Import PaymentService
-import { PaymentDTO, CreatePaymentInput, UpdatePaymentInput } from './dto/payment.dto'; // Import DTOs Payment
+import { PaymentService } from './payment.service'; 
+import { PaymentDTO, CreatePaymentInput, UpdatePaymentInput } from './dto/payment.dto'; 
 
 @Resolver(() => PaymentDTO) // Mengaitkan resolver ini dengan tipe PaymentDTO GraphQL
 export class PaymentResolver {

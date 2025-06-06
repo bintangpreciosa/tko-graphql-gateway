@@ -2,7 +2,7 @@
 import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { ProductService } from './product.service';
 import { ProductDTO, CreateProductInput, UpdateProductInput, ProductFilters } from './dto/product.dto';
-import { Product } from './entity/product.entity'; // Import entitas Product
+import { Product } from './entity/product.entity'; 
 
 @Resolver(() => ProductDTO)
 export class ProductResolver {
@@ -38,7 +38,6 @@ export class ProductResolver {
   @Query(() => [ProductDTO], { description: 'Mengambil daftar semua produk, bisa difilter.' })
   async allProducts(@Args('filters', { nullable: true }) filters?: ProductFilters): Promise<ProductDTO[]> {
     const products = await this.productService.findAll(filters);
-    // *** PERUBAHAN DI SINI UNTUK allProducts ***
     // Map dan filter out setiap nilai null dari array
     return products.map(p => this.mapProductToDTO(p)).filter((p): p is ProductDTO => p !== null);
   }
@@ -47,8 +46,6 @@ export class ProductResolver {
   @Mutation(() => ProductDTO, { description: 'Membuat produk baru.' })
   async createProduct(@Args('input') input: CreateProductInput): Promise<ProductDTO> {
     const newProduct = await this.productService.create(input);
-    // *** PERUBAHAN DI SINI UNTUK createProduct ***
-    // Gunakan non-null assertion (!) karena kita tahu ini tidak akan null dari service
     return this.mapProductToDTO(newProduct)!;
   }
 
@@ -59,8 +56,6 @@ export class ProductResolver {
     @Args('input') input: UpdateProductInput,
   ): Promise<ProductDTO> {
     const updatedProduct = await this.productService.update(product_id, input);
-    // *** PERUBAHAN DI SINI UNTUK updateProduct ***
-    // Gunakan non-null assertion (!) karena kita tahu ini tidak akan null dari service
     return this.mapProductToDTO(updatedProduct)!;
   }
 

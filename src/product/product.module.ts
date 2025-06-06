@@ -2,11 +2,11 @@
 import { Module } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductResolver } from './product.resolver';
-import { TypeOrmModule } from '@nestjs/typeorm'; // Import TypeOrmModule
-import { Product } from './entity/product.entity'; // Import Product Entity Anda
+import { TypeOrmModule } from '@nestjs/typeorm'; 
+import { Product } from './entity/product.entity'; 
 
 @Module({
-  imports: [ // Pastikan array 'imports' ini ada
+  imports: [ 
     // Mendaftarkan entitas Product ke TypeORM untuk koneksi 'productConnection'
     TypeOrmModule.forFeature([Product], 'productConnection'),
   ],

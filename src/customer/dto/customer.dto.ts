@@ -1,7 +1,7 @@
 // src/customer/dto/customer.dto.ts
 import { Field, ID, ObjectType, InputType, Int } from '@nestjs/graphql';
 
-// Catatan: Import DateTimeScalar tidak lagi diperlukan di sini karena kita menggunakan string untuk workaround.
+// Catatan: Import DateTimeScalar tidak lagi diperlukan di sini karena menggunakan string untuk workaround.
 // Namun, scalar ini tetap didefinisikan dan digunakan di app.module.ts.
 
 @ObjectType()

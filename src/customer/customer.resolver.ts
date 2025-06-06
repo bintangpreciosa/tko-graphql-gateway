@@ -22,7 +22,7 @@ export class CustomerResolver {
     return this.customerService.createCustomer(input);
   }
 
-  // Anda bisa tambahkan Query atau Mutation lain di sini sesuai kebutuhan Anda
+  // Bisa tambahkan Query atau Mutation lain di sini sesuai kebutuhan
   // Misalnya: customerByEmail, updateCustomer, deleteCustomer, dll.
   // @Query(() => CustomerDTO, { nullable: true, description: 'Mengambil customer berdasarkan email.' })
   // async customerByEmail(@Args('email') email: string): Promise<CustomerDTO> {

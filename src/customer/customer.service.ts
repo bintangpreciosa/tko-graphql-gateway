@@ -72,6 +72,4 @@ export class CustomerService {
     console.log(`[MOCK] Created new customer with ID: ${newId}`);
     return newCustomer;
   }
-
-  // Anda bisa tambahkan mock method untuk getCustomerByEmail, updateCustomer, dll. jika diperlukan
 }

@@ -10,9 +10,11 @@ import { DateTimeScalar } from './common/scalars/datetime.scalar';
 import { CustomerModule } from './customer/customer.module';
 import { ProductModule } from './product/product.module';
 import { OrderModule } from './order/order.module';
-import { PaymentModule } from './payment/payment.module'; // Import PaymentModule
+import { PaymentModule } from './payment/payment.module';
+import { ShipmentModule } from './shipment/shipment.module';
+import { CartModule } from './cart/cart.module';
 
-// Import semua DTOs yang merupakan GraphQL Type (masih relevan untuk schema generation)
+// Import DTO
 import {
   CustomerDTO,
   CustomerLogin,
@@ -39,48 +41,76 @@ import {
     }),
     // KONFIGURASI TYPEORM UNTUK DATABASE PRODUCT SERVICE
     TypeOrmModule.forRoot({
-      name: 'productConnection', // Beri nama koneksi ini
+      name: 'productConnection',
       type: 'mysql',
       host: 'localhost',
       port: 3306,
       username: 'root',
       password: '',
       database: 'product_service',
-      entities: [join(__dirname, '**', '*.entity.{ts,js}')], // Memuat semua entitas
-      synchronize: false, // Ingat untuk ubah ke false setelah tabel dibuat
+      entities: [join(__dirname, '**', '*.entity.{ts,js}')],
+      synchronize: false,
       logging: false,
     }),
     // KONFIGURASI TYPEORM UNTUK DATABASE ORDER SERVICE
     TypeOrmModule.forRoot({
-      name: 'orderConnection', // Beri nama koneksi ini
+      name: 'orderConnection',
       type: 'mysql',
       host: 'localhost',
       port: 3306,
       username: 'root',
       password: '',
       database: 'order_service',
-      entities: [join(__dirname, '**', '*.entity.{ts,js}')], // Memuat semua entitas
-      synchronize: false, // Ingat untuk ubah ke false setelah tabel dibuat
+      entities: [join(__dirname, '**', '*.entity.{ts,js}')],
+      synchronize: false,
       logging: false,
     }),
-    // KONFIGURASI TYPEORM BARU UNTUK DATABASE PAYMENT SERVICE
+    // KONFIGURASI TYPEORM UNTUK DATABASE PAYMENT SERVICE
     TypeOrmModule.forRoot({
-      name: 'paymentConnection', // Beri nama koneksi ini
+      name: 'paymentConnection',
       type: 'mysql',
       host: 'localhost',
       port: 3306,
       username: 'root',
       password: '',
-      database: 'payment_service', // Nama database untuk Payment Service
-      entities: [join(__dirname, '**', '*.entity.{ts,js}')], // Memuat semua entitas
+      database: 'payment_service',
+      entities: [join(__dirname, '**', '*.entity.{ts,js}')],
+      synchronize: false,
+      logging: false,
+    }),
+    // KONFIGURASI TYPEORM UNTUK DATABASE SHIPMENT SERVICE
+    TypeOrmModule.forRoot({
+      name: 'shipmentConnection',
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '',
+      database: 'shipment_service',
+      entities: [join(__dirname, '**', '*.entity.{ts,js}')],
+      synchronize: false, 
+      logging: false,
+    }),
+    // *** KONFIGURASI TYPEORM BARU UNTUK DATABASE CART SERVICE ***
+    TypeOrmModule.forRoot({
+      name: 'cartConnection', 
+      type: 'mysql',
+      host: 'localhost',
+      port: 3306,
+      username: 'root',
+      password: '', 
+      database: 'cart_service', 
+      entities: [join(__dirname, '**', '*.entity.{ts,js}')], 
       synchronize: false, // Untuk pertama kali, bisa set true agar tabel dibuat otomatis
       logging: false,
     }),
-    // Modul-modul aplikasi Anda
+    // Modul-modul aplikasi
     CustomerModule,
     ProductModule,
     OrderModule,
-    PaymentModule, // Daftarkan PaymentModule di sini
+    PaymentModule,
+    ShipmentModule,
+    CartModule,
   ],
   controllers: [],
   providers: [DateTimeScalar],

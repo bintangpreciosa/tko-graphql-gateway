@@ -39,23 +39,22 @@ export class OrderDTO {
   total_price: number;
 
   @Field(() => String, { nullable: true })
-  payment_status?: string | null; // Sekarang bisa string, null, atau undefined
+  payment_status?: string | null;
 
   @Field(() => String, { nullable: true })
-  shipping_status?: string | null; // Sekarang bisa string, null, atau undefined
+  shipping_status?: string | null;
 
-  // --- PERUBAHAN DI SINI: MENAMBAHKAN '| null' KE TIPE ALAMAT ---
-  @Field(() => String, { nullable: true }) // <-- UBAH INI
+  @Field(() => String, { nullable: true }) 
   shipping_address_street?: string | null;
 
-  @Field(() => String, { nullable: true }) // <-- UBAH INI
+  @Field(() => String, { nullable: true }) 
   shipping_address_city?: string | null;
 
-  @Field(() => String, { nullable: true }) // <-- UBAH INI
-  shipping_address_postal_code?: string | null; // <-- UBAH INI
+  @Field(() => String, { nullable: true }) 
+  shipping_address_postal_code?: string | null; 
 
-  @Field(() => String, { nullable: true }) // <-- UBAH INI
-  shipping_address_country?: string | null; // Sekarang bisa string, null, atau undefined
+  @Field(() => String, { nullable: true }) 
+  shipping_address_country?: string | null; 
 
   @Field(() => String)
   created_at: string;

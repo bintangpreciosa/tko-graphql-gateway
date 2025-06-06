@@ -2,16 +2,16 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Payment } from './entity/payment.entity'; // Import Payment entity
-import { CreatePaymentInput, UpdatePaymentInput, PaymentDTO } from './dto/payment.dto'; // Import DTOs
-import { OrderService } from '../order/order.service'; // Import OrderService
+import { Payment } from './entity/payment.entity'; 
+import { CreatePaymentInput, UpdatePaymentInput, PaymentDTO } from './dto/payment.dto'; 
+import { OrderService } from '../order/order.service'; 
 
 @Injectable()
 export class PaymentService {
   constructor(
-    @InjectRepository(Payment, 'paymentConnection') // Inject Repository untuk Payment
+    @InjectRepository(Payment, 'paymentConnection') 
     private paymentRepository: Repository<Payment>,
-    private orderService: OrderService, // Inject OrderService
+    private orderService: OrderService, 
   ) {}
 
   // Helper untuk mengubah Payment Entity menjadi PaymentDTO
@@ -25,38 +25,6 @@ export class PaymentService {
     paymentDTO.payment_method = payment.payment_method;
     paymentDTO.payment_status = payment.payment_status;
     paymentDTO.payment_date = payment.payment_date ? payment.payment_date.toISOString() : '';
-
-    // Jika relasi order dimuat, map juga order DTO-nya
-    // if (payment.order) {
-    //     // Anda perlu method mapOrderToDTO dari OrderService atau buat helper di sini
-    //     // Untuk kesederhanaan, kita hanya akan memasukkan ID order di PaymentDTO
-    //     // Jika Anda ingin OrderDTO lengkap, PaymentService perlu mengakses OrderService.mapOrderToDTO
-    //     // Atau Anda bisa langsung memetakan field Order yang relevan saja.
-    //     // Untuk saat ini, kita akan asumsikan hanya order_id yang penting di PaymentDTO
-    //     paymentDTO.order = {
-    //         order_id: payment.order.order_id,
-    //         customer_crm_id: payment.order.customer_crm_id,
-    //         total_price: payment.order.total_price,
-    //         payment_status: payment.order.payment_status,
-    //         shipping_status: payment.order.shipping_status,
-    //         order_date: payment.order.order_date.toISOString(),
-    //         // Field OrderDTO lainnya jika perlu di-expose di PaymentDTO
-    //         order_items: payment.order.order_items ? payment.order.order_items.map(item => ({
-    //           order_item_id: item.order_item_id,
-    //           order_id: item.order_id,
-    //           product_id: item.product_id,
-    //           product_name: item.product_name,
-    //           quantity: item.quantity,
-    //           price: item.price,
-    //         })) : [],
-    //         shipping_address_street: payment.order.shipping_address_street,
-    //         shipping_address_city: payment.order.shipping_address_city,
-    //         shipping_address_postal_code: payment.order.shipping_address_postal_code,
-    //         shipping_address_country: payment.order.shipping_address_country,
-    //         created_at: payment.order.created_at.toISOString(),
-    //         updated_at: payment.order.updated_at ? payment.order.updated_at.toISOString() : undefined,
-    //     };
-    // }
 
     return paymentDTO;
   }
@@ -112,9 +80,9 @@ export class PaymentService {
       const updatedPayment = await this.paymentRepository.save(payment);
 
       // Jika perlu update OrderService, ambil OrderDTO dulu
-      if (payment_status === 'SUCCESS') { // Asumsikan kita hanya perlu order_id dan shipping_status
+      if (payment_status === 'SUCCESS') { // Asumsi hanya perlu order_id dan shipping_status
           const order = await this.orderService.findOneById(payment.order_id);
-          if (order) { // Pastikan order ditemukan
+          if (order) { 
               await this.orderService.updateStatus(order.order_id, 'PAID', order.shipping_status);
           }
       }

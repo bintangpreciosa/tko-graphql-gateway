@@ -1,17 +1,13 @@
 // src/payment/entity/payment.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
 
-@Entity('Payment') // Nama tabel di database adalah 'Payment' (sesuai spesifikasi Anda)
+@Entity('Payment') 
 export class Payment {
   @PrimaryGeneratedColumn()
   payment_id: number;
 
   @Column()
   order_id: number; // Foreign key ke tabel orders
-
-//   @ManyToOne(() => Order, order => order.payments) // Relasi ke Order
-//   @JoinColumn({ name: 'order_id' })
-//   order: Order;
 
   @Column({ type: 'decimal', precision: 12, scale: 2 })
   amount: number;

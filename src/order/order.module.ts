@@ -1,14 +1,14 @@
 // src/order/order.module.ts
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm'; // Import TypeOrmModule
+import { TypeOrmModule } from '@nestjs/typeorm'; 
 
 import { OrderService } from './order.service';
 import { OrderResolver } from './order.resolver';
-import { Order } from './entity/order.entity'; // Import Order Entity
-import { OrderItem } from './entity/order-item.entity'; // Import OrderItem Entity
+import { Order } from './entity/order.entity'; 
+import { OrderItem } from './entity/order-item.entity'; 
 
-import { ProductModule } from '../product/product.module'; // Import ProductModule
-import { CustomerModule } from '../customer/customer.module'; // Import CustomerModule
+import { ProductModule } from '../product/product.module'; 
+import { CustomerModule } from '../customer/customer.module'; 
 
 @Module({
   imports: [

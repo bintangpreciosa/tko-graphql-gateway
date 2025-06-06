@@ -9,9 +9,6 @@ export class PaymentDTO {
   @Field(() => ID)
   order_id: number;
 
-//   @Field(() => OrderDTO, { nullable: true })
-//   order?: OrderDTO;
-
   @Field(() => Float)
   amount: number;
 

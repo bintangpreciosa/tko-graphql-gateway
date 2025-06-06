@@ -1,7 +1,7 @@
 // src/order/order.service.ts
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm'; // Tidak perlu Like untuk OrderService ini
+import { Repository } from 'typeorm'; 
 import { Order } from './entity/order.entity';
 import { OrderItem } from './entity/order-item.entity';
 

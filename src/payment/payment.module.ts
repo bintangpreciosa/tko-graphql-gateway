@@ -1,11 +1,11 @@
 // src/payment/payment.module.ts
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm'; // Import TypeOrmModule
+import { TypeOrmModule } from '@nestjs/typeorm'; 
 import { PaymentService } from './payment.service';
 import { PaymentResolver } from './payment.resolver';
-import { Payment } from './entity/payment.entity'; // Import Payment Entity
+import { Payment } from './entity/payment.entity'; 
 
-import { OrderModule } from '../order/order.module'; // Import OrderModule
+import { OrderModule } from '../order/order.module'; 
 
 @Module({
   imports: [

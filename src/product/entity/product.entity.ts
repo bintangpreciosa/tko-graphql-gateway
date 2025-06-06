@@ -1,7 +1,7 @@
 // src/product/entity/product.entity.ts
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
-@Entity('Product') // Menunjukkan bahwa kelas ini adalah entitas dan akan dipetakan ke tabel bernama 'Product' di database
+@Entity('Product') 
 export class Product {
   @PrimaryGeneratedColumn('increment') // product_id INT AUTO_INCREMENT PRIMARY KEY
   product_id: number; // Tipe data TypeScript untuk kolom ID
