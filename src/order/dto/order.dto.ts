@@ -72,14 +72,14 @@ export class CreateOrderItemInput {
   @Field(() => Int)
   product_id: number;
 
-  @Field()
-  product_name: string; // Snapshot nama produk dari ProductService
+//   @Field()
+//   product_name: string; // Snapshot nama produk dari ProductService
 
   @Field(() => Int)
   quantity: number;
 
-  @Field(() => Float)
-  price: number; // Snapshot harga dari ProductService
+//   @Field(() => Float)
+//   price: number; // Snapshot harga dari ProductService
 }
 
 @InputType()

@@ -48,9 +48,7 @@ input CreateOrderInput {
 }
 
 input CreateOrderItemInput {
-  price: Float!
   product_id: Int!
-  product_name: String!
   quantity: Int!
 }
 
@@ -76,6 +74,13 @@ input CreateShipmentInput {
   tracking_number: String
 }
 
+type CustomerConnection {
+  customers: [CustomerDTO!]!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  totalCount: Int!
+}
+
 type CustomerDTO {
   address: String
   city: String
@@ -85,9 +90,19 @@ type CustomerDTO {
   id: ID!
   logins: [CustomerLogin!]
   name: String!
+
+  """Daftar pesanan yang dibuat oleh customer ini."""
+  orders: [OrderDTO!]
   phone: String
   postal_code: String
-  updated_at: String
+}
+
+input CustomerFilters {
+  city: String
+  country: String
+  limit: Int
+  offset: Int
+  search: String
 }
 
 type CustomerLogin {
@@ -128,6 +143,9 @@ type Mutation {
 
   """Menghapus keranjang belanja sepenuhnya berdasarkan ID."""
   deleteCart(cart_id: ID!): Boolean!
+
+  """Menghapus customer dari CRM Service."""
+  deleteCustomer(id: ID!): Boolean!
 
   """Menghapus pesanan berdasarkan ID."""
   deleteOrder(order_id: ID!): Boolean!
@@ -241,6 +259,11 @@ type Query {
 
   """Mengambil detail customer berdasarkan ID dari CRM Service."""
   customer(id: ID!): CustomerDTO
+
+  """
+  Mengambil daftar semua customer dari CRM Service, dengan filter opsional.
+  """
+  customers(filters: CustomerFilters): CustomerConnection!
 
   """Mengambil detail pesanan berdasarkan ID."""
   order(order_id: ID!): OrderDTO

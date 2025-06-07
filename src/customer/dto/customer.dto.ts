@@ -1,16 +1,13 @@
 // src/customer/dto/customer.dto.ts
 import { Field, ID, ObjectType, InputType, Int } from '@nestjs/graphql';
 
-// Catatan: Import DateTimeScalar tidak lagi diperlukan di sini karena menggunakan string untuk workaround.
-// Namun, scalar ini tetap didefinisikan dan digunakan di app.module.ts.
-
 @ObjectType()
 export class CustomerLogin {
   @Field(() => ID)
   id: string;
 
   @Field(() => Int)
-  customer_id: number; // Sesuai dengan tipe Int dari CRM
+  customer_id: number; 
 
   // Menggunakan String sebagai workaround untuk masalah schema generation dengan DateTimeScalar
   @Field(() => String)
@@ -28,7 +25,7 @@ export class CustomerDTO {
   @Field()
   email: string;
 
-  @Field({ nullable: true }) // nullable: true karena 'phone' bisa null di skema CRM
+  @Field({ nullable: true })
   phone?: string;
 
   @Field({ nullable: true })
@@ -43,15 +40,9 @@ export class CustomerDTO {
   @Field({ nullable: true })
   country?: string;
 
-  // Menggunakan String sebagai workaround untuk masalah schema generation dengan DateTimeScalar
   @Field(() => String)
   created_at: string;
 
-  // Menggunakan String sebagai workaround untuk masalah schema generation dengan DateTimeScalar
-  @Field(() => String, { nullable: true })
-  updated_at?: string;
-
-  // Hubungan dengan CustomerLogin, jika Anda ingin mengeksposnya juga
   @Field(() => [CustomerLogin], { nullable: true })
   logins?: CustomerLogin[];
 }
@@ -102,4 +93,22 @@ export class UpdateCustomerInput {
 
   @Field({ nullable: true })
   country?: string;
+}
+
+@InputType()
+export class CustomerFilters {
+  @Field(() => String, { nullable: true })
+  search?: string;
+  
+  @Field(() => String, { nullable: true })
+  city?: string;
+
+  @Field(() => String, { nullable: true })
+  country?: string;
+
+  @Field(() => Int, { nullable: true })
+  limit?: number;
+
+  @Field(() => Int, { nullable: true })
+  offset?: number;
 }

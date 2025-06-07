@@ -1,75 +1,230 @@
 // src/customer/customer.service.ts
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-// Tidak perlu axios lagi untuk mock data sementara
-// import axios from 'axios';
-import { CustomerDTO, CreateCustomerInput, UpdateCustomerInput } from './dto/customer.dto';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import axios from 'axios';
+import { CustomerDTO, CreateCustomerInput, UpdateCustomerInput, CustomerFilters } from './dto/customer.dto';
 
 @Injectable()
 export class CustomerService {
-  // Tidak perlu lagi endpoint CRM untuk mock data sementara
-  // private readonly CRM_GRAPHQL_ENDPOINT = 'http://localhost:3000/graphql';
-  // private readonly AUTH_HEADERS = { 'Content-Type': 'application/json' };
+  // Endpoint CRM Anda (pastikan ini sesuai)
+  private readonly CRM_GRAPHQL_ENDPOINT = 'http://localhost:3000/graphql';
 
-  // Data customer mock sementara
-  private mockCustomers: CustomerDTO[] = [
-    {
-      id: '1',
-      name: 'Budi Mock',
-      email: 'budi.mock@example.com',
-      phone: '08111111111',
-      address: 'Jl. Mock Raya No. 1',
-      city: 'Mock City',
-      postal_code: '10000',
-      country: 'Indonesia',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      logins: []
-    },
-    {
-      id: '2',
-      name: 'Siti Mock',
-      email: 'siti.mock@example.com',
-      phone: '08222222222',
-      address: 'Jl. Tes Mock No. 2',
-      city: 'Mock City',
-      postal_code: '20000',
-      country: 'Indonesia',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      logins: []
-    },
-  ];
-  private nextMockId = 3; // Untuk generate ID baru jika membuat customer mock
+  private readonly AUTH_HEADERS = {
+    // 'Authorization': 'Bearer YOUR_CRM_API_KEY_OR_TOKEN', // Uncomment & ganti jika butuh auth
+    'Content-Type': 'application/json',
+  };
+
+  // Helper untuk memetakan Customer dari respon CRM ke CustomerDTO
+  // (Karena CustomerDTO memiliki tanggal sebagai string, dan tanpa updated_at)
+  private mapCrmCustomerToDTO(crmCustomer: any): CustomerDTO | null {
+    if (!crmCustomer) return null;
+
+    const customerDTO = new CustomerDTO();
+    customerDTO.id = String(crmCustomer.id);
+    customerDTO.name = crmCustomer.name;
+    customerDTO.email = crmCustomer.email;
+    customerDTO.phone = crmCustomer.phone ?? null;
+    customerDTO.address = crmCustomer.address ?? null;
+    customerDTO.city = crmCustomer.city ?? null;
+    customerDTO.postal_code = crmCustomer.postal_code ?? null;
+    customerDTO.country = crmCustomer.country ?? null;
+    
+    customerDTO.created_at = crmCustomer.created_at || '';
+    return customerDTO;
+  }
 
   async getCustomerById(id: string): Promise<CustomerDTO | null> {
-    const customer = this.mockCustomers.find(c => c.id === id);
-    if (customer) {
-      console.log(`[MOCK] Fetched customer with ID: ${id}`);
-      return customer;
+    const query = `
+      query GetCustomer($id: ID!) {
+        customer(id: $id) {
+          id
+          name
+          email
+          phone
+          address
+          city
+          postal_code
+          country
+          created_at
+          # updated_at DIHAPUS SESUAI PERMINTAAN CRM
+        }
+      }
+    `;
+    try {
+      const response = await axios.post(
+        this.CRM_GRAPHQL_ENDPOINT,
+        { query, variables: { id } },
+        { headers: this.AUTH_HEADERS },
+      );
+
+      if (response.data.errors) {
+        console.error('CRM GraphQL Errors in getCustomerById:', response.data.errors);
+        throw new InternalServerErrorException('CRM API returned errors for customer query.');
+      }
+      if (!response.data.data || !response.data.data.customer) {
+          return null; // Customer tidak ditemukan di CRM
+      }
+      return this.mapCrmCustomerToDTO(response.data.data.customer)!;
+    } catch (error) {
+      console.error('Error fetching customer by ID from CRM:', error.response?.data || error.message);
+      throw new InternalServerErrorException('Failed to fetch customer data from CRM.');
     }
-    console.log(`[MOCK] Customer with ID: ${id} not found.`);
-    // Sekarang, mengembalikan null diizinkan oleh tipe kembalian
-    return null;
   }
 
   async createCustomer(input: CreateCustomerInput): Promise<CustomerDTO> {
-    // Generate ID baru untuk mock customer
-    const newId = String(this.nextMockId++);
-    const newCustomer: CustomerDTO = {
-      id: newId,
-      name: input.name,
-      email: input.email,
-      phone: input.phone || undefined,
-      address: input.address || undefined,
-      city: input.city || undefined,
-      postal_code: input.postal_code || undefined,
-      country: input.country || undefined,
-      created_at: new Date().toISOString(),
-      updated_at: undefined, // updated_at juga bisa jadi undefined jika tidak ada update
-      logins: []
-    };
-    this.mockCustomers.push(newCustomer);
-    console.log(`[MOCK] Created new customer with ID: ${newId}`);
-    return newCustomer;
+    const mutation = `
+      mutation CreateCustomer($input: CreateCustomerInput!) {
+        createCustomer(input: $input) {
+          id
+          name
+          email
+          phone
+          address
+          city
+          postal_code
+          country
+          created_at
+          # updated_at DIHAPUS SESUAI PERMINTAAN CRM
+        }
+      }
+    `;
+    try {
+      const response = await axios.post(
+        this.CRM_GRAPHQL_ENDPOINT,
+        { query: mutation, variables: { input } },
+        { headers: this.AUTH_HEADERS },
+      );
+
+      if (response.data.errors) {
+        console.error('CRM GraphQL Errors in createCustomer:', response.data.errors);
+        throw new InternalServerErrorException('CRM API returned errors for customer creation.');
+      }
+      if (!response.data.data || !response.data.data.createCustomer) {
+          throw new InternalServerErrorException('CRM API did not return created customer data.');
+      }
+      return this.mapCrmCustomerToDTO(response.data.data.createCustomer)!;
+    } catch (error) {
+      console.error('Error creating customer in CRM:', error.response?.data || error.message);
+      throw new InternalServerErrorException('Failed to create customer in CRM.');
+    }
+  }
+
+  // Method untuk mengambil semua customer dari CRM
+  async findAllCustomers(filters?: CustomerFilters): Promise<any> { // Menggunakan 'any' untuk kembalian dari CRM yang kompleks (CustomerConnection)
+    const query = `
+      query GetCustomers($filters: CustomerFilters) {
+        customers(filters: $filters) {
+          customers {
+            id
+            name
+            email
+            phone
+            address
+            city
+            postal_code
+            country
+            created_at
+            # updated_at DIHAPUS
+          }
+          totalCount
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    `;
+    try {
+      const response = await axios.post(
+        this.CRM_GRAPHQL_ENDPOINT,
+        { query, variables: { filters } },
+        { headers: this.AUTH_HEADERS },
+      );
+
+      if (response.data.errors) {
+        console.error('CRM GraphQL Errors in findAllCustomers:', response.data.errors);
+        throw new InternalServerErrorException('CRM API returned errors for all customers query.');
+      }
+      if (!response.data.data || !response.data.data.customers) {
+          // Mengembalikan struktur kosong jika tidak ada data atau formatnya salah
+          return { customers: [], totalCount: 0, hasNextPage: false, hasPreviousPage: false };
+      }
+      // Mapping setiap customer ke DTO Anda
+      const mappedCustomers = response.data.data.customers.customers.map(c => this.mapCrmCustomerToDTO(c)).filter((c): c is CustomerDTO => c !== null);
+
+      return {
+          customers: mappedCustomers,
+          totalCount: response.data.data.customers.totalCount,
+          hasNextPage: response.data.data.customers.hasNextPage,
+          hasPreviousPage: response.data.data.customers.hasPreviousPage,
+      };
+    } catch (error) {
+      console.error('Error fetching all customers from CRM:', error.response?.data || error.message);
+      throw new InternalServerErrorException('Failed to fetch all customer data from CRM.');
+    }
+  }
+
+  async updateCustomer(id: string, input: UpdateCustomerInput): Promise<CustomerDTO> {
+    const mutation = `
+      mutation UpdateCustomer($id: ID!, $input: UpdateCustomerInput!) {
+        updateCustomer(id: $id, input: $input) {
+          id
+          name
+          email
+          phone
+          address
+          city
+          postal_code
+          country
+          created_at # created_at tetap diambil
+          # updated_at DIHAPUS dari query GraphQL
+        }
+      }
+    `;
+    try {
+      const response = await axios.post(
+        this.CRM_GRAPHQL_ENDPOINT,
+        { query: mutation, variables: { id, input } },
+        { headers: this.AUTH_HEADERS },
+      );
+
+      if (response.data.errors) {
+        console.error('CRM GraphQL Errors in updateCustomer:', response.data.errors);
+        const crmError = response.data.errors[0];
+        if (crmError && crmError.message.includes('not found')) {
+            throw new NotFoundException(`Customer with ID ${id} not found in CRM.`);
+        }
+        throw new InternalServerErrorException('CRM API returned errors for customer update. (Possibly missing updated_at column in CRM DB)');
+      }
+      if (!response.data.data || !response.data.data.updateCustomer) {
+          throw new InternalServerErrorException('CRM API did not return updated customer data.');
+      }
+      return this.mapCrmCustomerToDTO(response.data.data.updateCustomer)!;
+    } catch (error) {
+      console.error('Error updating customer in CRM:', error.response?.data || error.message);
+      throw new InternalServerErrorException('Failed to update customer in CRM.');
+    }
+  }
+
+  // Method untuk menghapus customer
+  async deleteCustomer(id: string): Promise<boolean> {
+    const mutation = `
+      mutation DeleteCustomer($id: ID!) {
+        deleteCustomer(id: $id)
+      }
+    `;
+    try {
+      const response = await axios.post(
+        this.CRM_GRAPHQL_ENDPOINT,
+        { query: mutation, variables: { id } },
+        { headers: this.AUTH_HEADERS },
+      );
+
+      if (response.data.errors) {
+        console.error('CRM GraphQL Errors in deleteCustomer:', response.data.errors);
+        throw new InternalServerErrorException('CRM API returned errors for customer deletion.');
+      }
+      return response.data.data.deleteCustomer;
+    } catch (error) {
+      console.error('Error deleting customer in CRM:', error.response?.data || error.message);
+      throw new InternalServerErrorException('Failed to delete customer in CRM.');
+    }
   }
 }

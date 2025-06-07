@@ -1,7 +1,7 @@
 // src/order/order.service.ts
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm'; 
+import { Repository } from 'typeorm';
 import { Order } from './entity/order.entity';
 import { OrderItem } from './entity/order-item.entity';
 
@@ -10,7 +10,7 @@ import { ProductService } from '../product/product.service';
 import { CustomerService } from '../customer/customer.service'; // Ini menggunakan mock data
 
 // DTOs untuk Order Service
-import { OrderDTO, OrderItemDTO, CreateOrderInput, UpdateOrderInput, OrderFilters } from './dto/order.dto';
+import { OrderDTO, OrderItemDTO, CreateOrderInput, UpdateOrderInput, OrderFilters, CreateOrderItemInput } from './dto/order.dto';
 import { ProductDTO } from '../product/dto/product.dto'; // Untuk validasi produk dari ProductService
 
 @Injectable()
@@ -116,32 +116,26 @@ export class OrderService {
     let total_price = 0;
     const orderItems: OrderItem[] = [];
 
-    // 2. Validasi Produk dan Hitung Total Harga dari ProductService
+    // 2. Validasi Produk, Ambil Info Terbaru, dan Hitung Total Harga dari ProductService
     for (const itemInput of input.items) {
       const product = await this.productService.findOneById(itemInput.product_id);
       if (!product || product.stock < itemInput.quantity) {
-        throw new BadRequestException(`Product ${itemInput.product_name} (ID: ${itemInput.product_id}) is out of stock or not found.`);
+        throw new BadRequestException(`Product (ID: ${itemInput.product_id}) is out of stock or not found.`);
       }
-      // Validasi harga: pastikan harga di input item sama dengan harga produk sebenarnya
-      // PERBAIKAN: Konversi kedua harga ke number menggunakan parseFloat() sebelum membandingkan
-      const productPriceAsNumber = parseFloat(product.price as any); // Pastikan ini number
-      const itemInputPriceAsNumber = parseFloat(itemInput.price as any); // Pastikan ini number
-
-      if (productPriceAsNumber.toFixed(2) !== itemInputPriceAsNumber.toFixed(2)) {
-        throw new BadRequestException(
-          `Price mismatch for product ${itemInput.product_name}. Expected ${productPriceAsNumber.toFixed(2)}, got ${itemInputPriceAsNumber.toFixed(2)}.`
-        );
-      }
-
+      
+      // MENGHAPUS VALIDASI HARGA DAN MENGAMBIL product.name / product.price DARI ProductService
+      // Harga dan nama produk akan diambil langsung dari ProductService (otoritatif)
+      // product.price.toFixed(2) !== itemInput.price.toFixed(2) tidak digunakan lagi
+      
       // Buat OrderItem entity
       const orderItem = new OrderItem();
       orderItem.product_id = itemInput.product_id;
-      orderItem.product_name = itemInput.product_name;
+      orderItem.product_name = product.name; // <-- Ambil nama produk dari ProductService (otoritatif)
       orderItem.quantity = itemInput.quantity;
-      orderItem.price = itemInput.price; // Gunakan harga yang diberikan di input (setelah diverifikasi)
+      orderItem.price = product.price; // <-- Ambil harga dari ProductService (otoritatif)
       orderItems.push(orderItem);
 
-      total_price += itemInput.quantity * itemInput.price;
+      total_price += itemInput.quantity * product.price; // Gunakan harga dari ProductService
 
       // Kurangi stok produk (Ini adalah contoh sederhana, perlu transaksi terdistribusi untuk skala besar)
       // Perhatikan: Dalam sistem produksi, ini perlu dilakukan dalam transaksi database yang sama atau menggunakan saga/choreography
@@ -179,10 +173,10 @@ export class OrderService {
     }
 
     // Memperbarui status jika diberikan
-    if (payment_status) {
+    if (payment_status !== undefined) { // Mengizinkan null untuk di-assign
       order.payment_status = payment_status;
     }
-    if (shipping_status !== undefined) { // Memastikan null juga diterima
+    if (shipping_status !== undefined) { // Mengizinkan null untuk di-assign
       order.shipping_status = shipping_status;
     }
 

@@ -1,24 +1,22 @@
 // src/order/order.module.ts
-import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm'; 
+import { forwardRef, Module } from '@nestjs/common'; // *** TAMBAHKAN forwardRef ***
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { OrderService } from './order.service';
 import { OrderResolver } from './order.resolver';
-import { Order } from './entity/order.entity'; 
-import { OrderItem } from './entity/order-item.entity'; 
+import { Order } from './entity/order.entity';
+import { OrderItem } from './entity/order-item.entity';
 
-import { ProductModule } from '../product/product.module'; 
-import { CustomerModule } from '../customer/customer.module'; 
+import { ProductModule } from '../product/product.module';
+import { CustomerModule } from '../customer/customer.module'; // Import CustomerModule
 
 @Module({
   imports: [
-    // Mendaftarkan entitas Order dan OrderItem untuk koneksi database default (orderConnection)
-    TypeOrmModule.forFeature([Order, OrderItem], 'orderConnection'), // Gunakan nama koneksi 'orderConnection'
-    // Mengimpor ProductModule dan CustomerModule agar OrderService bisa menggunakan service dari modul tersebut
+    TypeOrmModule.forFeature([Order, OrderItem], 'orderConnection'),
     ProductModule,
-    CustomerModule,
+    forwardRef(() => CustomerModule), // *** BUNGKUS CustomerModule dengan forwardRef ***
   ],
   providers: [OrderService, OrderResolver],
-  exports: [OrderService] // Ekspor OrderService agar bisa digunakan modul lain (misalnya PaymentService, ShipmentService)
+  exports: [OrderService]
 })
 export class OrderModule {}
